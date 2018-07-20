@@ -1,4 +1,10 @@
-{
-  "selector":"hoge",
-  "attr":"href"
-}
+[
+  {
+    "selector":"hoge",
+    "attr":"href"
+  },
+  {
+    "selector":"aa",
+    "attr":"bb"
+  }
+]

@@ -9,8 +9,8 @@ import (
 )
 
 type scrapingItem struct {
-  selector string `json:"selector"`
-  attr string `json:"attr"`
+  Selector string `json:"selector"`
+  Attr string `json:"attr"`
 }
 
 func main() {
@@ -20,9 +20,9 @@ func main() {
     return
   }
   for _, item := range items {
-    fmt.Printf("%s : %s\n", item.selector, item.attr)
-}
-//  scraping_url("")
+    fmt.Printf("%#v", item)
+  }
+  scraping_url("", items)
 
 }
 func read_setting() ([]scrapingItem, error) {
@@ -42,11 +42,11 @@ func read_setting() ([]scrapingItem, error) {
   return items, err
 }
 
-func scraping_url(url string) {
+func scraping_url(url string, items []scrapingItem) {
 
   doc, err := goquery.NewDocument(url)
   if err != nil {
-      fmt.Print("url scarapping failed:"+url)
+      log.Fatal(err)
       return
   }
 
@@ -54,6 +54,7 @@ func scraping_url(url string) {
   for hasNext {
     fmt.Println(url)
     fmt.Println("---------------------------------")
+    
     doc.Find("h2.p-result__name").Each(func(_ int, s *goquery.Selection) {
           fmt.Println(s.Text())
     })
@@ -61,7 +62,7 @@ func scraping_url(url string) {
     if exists {
       doc, err = goquery.NewDocument(url)
       if err != nil {
-          fmt.Print("url scarapping failed")
+          log.Fatal(err)
           return
       }
     }
