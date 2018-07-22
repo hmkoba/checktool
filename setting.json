@@ -1,10 +1,36 @@
-[
+{
+"next_page" : {
+  "selector" : "link[rel^='next']",
+  "attr" : "href"
+},
+"scraping_items" : [
   {
-    "selector":"hoge",
-    "attr":"href"
+    "name" : "test1",
+    "items" : [
+      {
+        "selector" : "section.p-result__item",
+        "is_parent" : true,
+        "items" : [
+          {
+            "selector" : "h2.p-result__name",
+            "attr" : "text"
+          },
+          {
+            "selector" : "span.p-spec__item--save",
+            "attr" : "text"
+          }
+        ]
+      }
+    ]
   },
   {
-    "selector":"aa",
-    "attr":"bb"
+    "name" : "test2",
+    "items" : [
+      {
+        "selector" : "title",
+        "attr" : "text"
+      }
+    ]
   }
 ]
+}
