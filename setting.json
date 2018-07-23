@@ -1,24 +1,25 @@
 {
+"separator" : "\t",
+
 "next_page" : {
   "selector" : "link[rel^='next']",
   "attr" : "href"
 },
+
 "scraping_items" : [
   {
     "name" : "test1",
     "items" : [
       {
         "selector" : "section.p-result__item",
-        "is_parent" : true,
+        "attr" : "data-id",
+        "attr2" : "data-measure",
         "items" : [
-          {
-            "selector" : "h2.p-result__name",
-            "attr" : "text"
-          },
-          {
-            "selector" : "span.p-spec__item--save",
-            "attr" : "text"
-          }
+          { "selector" : "h2.p-result__name",       "attr" : "text" },
+          { "selector" : "a.js-result-name",        "attr" : "href" },
+          { "selector" : "p.p-result__category",    "attr" : "text" },
+          { "selector" : "a.p-result__access > span",      "attr" : "text" },
+          { "selector" : "span.p-spec__item--save", "attr" : "text" }
         ]
       }
     ]
