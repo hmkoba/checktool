@@ -27,6 +27,27 @@
       { "selector" : "meta[property^='og:url']",    "attr" : "content" },
       { "selector" : "meta[property^='og:image']",  "attr" : "content" }
     ]
+  },
+  {
+    "name" : "shop",
+    "print_url"   : true,
+    "output_file" : "./resut_shop.tsv",
+    "encode"      : "ShiftJIS",
+    "separator"   : "\t",
+    "items" : [
+      {
+        "selector" : "section.p-result__item",
+        "attr" : "data-id",
+        "attr2" : "data-measure",
+        "items" : [
+          { "selector" : "h2.p-result__name",       "attr" : "text" },
+          { "selector" : "a.js-result-name",        "attr" : "href" },
+          { "selector" : "p.p-result__category",    "attr" : "text" },
+          { "selector" : "a.p-result__access > span",      "attr" : "text" },
+          { "selector" : "span.p-spec__item--save", "attr" : "text" }
+        ]
+      }
+    ]
   }
 ]
 }

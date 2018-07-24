@@ -75,12 +75,14 @@ func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.Wait
 
     for i, scrapingItem := range setting.ScrapingItems {
       fmt.Println(scrapingItem.Name)
-      result_line := scrapingDocument(doc, scrapingItem)
-      // 出力
-      if scrapingItem.OutputFile == "" || fd[i] == nil {
-        fmt.Print(result_line)
-      } else {
-        fd[i].Write([]byte(encodeString(result_line, scrapingItem.Encode)))
+
+      for _, line := range scrapingDocument(doc, scrapingItem) {
+        // 出力
+        if scrapingItem.OutputFile == "" || fd[i] == nil {
+          fmt.Println(line)
+        } else {
+          fd[i].Write([]byte(encodeString(line, scrapingItem.Encode)+"\n"))
+        }
       }
     }
 
@@ -95,16 +97,14 @@ func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.Wait
 /*
   取得
 */
-func scrapingDocument(doc *goquery.Document, sc scrapingItems) string {
+func scrapingDocument(doc *goquery.Document, sc scrapingItems) []string {
 
-  line := ""
-  if sc.PrintUrl {
-    line = formatLine(line, doc.Url.String(), sc.Enclose, sc.Separator)
-  }
+  result := []string{}
+  line := initLine(doc.Url.String(), sc.PrintUrl, sc.Enclose)
+
   for _, item := range sc.Items {
 
     doc.Find(item.Selector).Each(func(_ int, s *goquery.Selection) {
-
       if item.Attr != "" {
         line = formatLine(line, getAttr(s, item.Attr), sc.Enclose, sc.Separator)
       }
@@ -112,14 +112,31 @@ func scrapingDocument(doc *goquery.Document, sc scrapingItems) string {
         line = formatLine(line, getAttr(s, item.Attr2), sc.Enclose, sc.Separator)
       }
 
-      for _, child_item := range item.Items {
-        s.Find(child_item.Selector).Each(func(_ int, cs *goquery.Selection) {
-          line = formatLine(line, getAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
-        })
+      if len(item.Items) > 0 {
+        cl := ""
+        for _, child_item := range item.Items {
+          s.Find(child_item.Selector).Each(func(_ int, cs *goquery.Selection) {
+            cl = formatLine(cl, getAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
+          })
+        }
+        result = append(result, line + sc.Separator + cl)
+        line = initLine(doc.Url.String(), sc.PrintUrl, sc.Enclose)
       }
     })
   }
-  return line + "\n"
+
+  if len(result) == 0 {
+    result = append(result, line)
+  }
+  return result
+}
+
+func initLine(s string, p bool, e string) string{
+  if p {
+    return formatLine("", s, e, "")
+  }
+  return ""
+
 }
 
 /*
