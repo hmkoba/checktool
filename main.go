@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-  setting, err := read_setting()
+  setting, err := readSetting()
   if err != nil {
     return
   }
@@ -22,7 +22,7 @@ func main() {
   fd := make(map[int]*os.File)
   for i, scrapingItem := range setting.ScrapingItems {
     if scrapingItem.OutputFile != "" {
-      f, err := os.OpenFile(scrapingItem.OutputFile, os.O_WRONLY|os.O_CREATE, 0666)
+      f, err := os.OpenFile(scrapingItem.OutputFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
       if err != nil {
           //エラー処理
           log.Fatal(err)
@@ -43,7 +43,7 @@ func main() {
   for _, url := range urls {
     ch <- true
     w.Add(1)
-    go scraping_url(url, setting, ch, &w, fd)
+    go scrapingUrl(url, setting, ch, &w, fd)
   }
   w.Wait()
 
@@ -52,7 +52,7 @@ func main() {
 /*
   スクレイピングメイン処理
 */
-func scraping_url(url string, setting scrapingSetting, ch chan bool, w *sync.WaitGroup, fd map[int]*os.File) {
+func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.WaitGroup, fd map[int]*os.File) {
 
   defer func() { <-ch }()
   defer w.Done()
@@ -71,17 +71,17 @@ func scraping_url(url string, setting scrapingSetting, ch chan bool, w *sync.Wai
 
     for i, scrapingItem := range setting.ScrapingItems {
       fmt.Println(scrapingItem.Name)
-      result_line := scraping_items(doc, scrapingItem.Items, scrapingItem.PrintUrl)
+      result_line := scrapingDocument(doc, scrapingItem)
       // 出力
       if scrapingItem.OutputFile == "" || fd[i] == nil {
         fmt.Print(result_line)
       } else {
-        fd[i].Write([]byte(result_line))
+          fd[i].Write([]byte(encodeString(result_line, setting.Encode)))
       }
     }
 
     if setting.NextPage.Selector != "" {
-      doc, hasNext = get_next_document(doc, setting)
+      doc, hasNext = getNextDocument(doc, setting)
     } else {
       hasNext = false
     }
@@ -91,26 +91,26 @@ func scraping_url(url string, setting scrapingSetting, ch chan bool, w *sync.Wai
 /*
   取得
 */
-func scraping_items(doc *goquery.Document, items []items, printUrl bool) string {
+func scrapingDocument(doc *goquery.Document, sc scrapingItems) string {
 
   line := ""
-  if printUrl {
-    line = format_line(line, doc.Url.String())
+  if sc.PrintUrl {
+    line = formatLine(line, doc.Url.String(), sc.Enclose)
   }
-  for _, item := range items {
+  for _, item := range sc.Items {
 
     doc.Find(item.Selector).Each(func(_ int, s *goquery.Selection) {
 
       if item.Attr != "" {
-        line = format_line(line, get_attr(s, item.Attr))
+        line = formatLine(line, getAttr(s, item.Attr), sc.Enclose)
       }
       if item.Attr2 != "" {
-        line = format_line(line, get_attr(s, item.Attr2))
+        line = formatLine(line, getAttr(s, item.Attr2), sc.Enclose)
       }
 
       for _, child_item := range item.Items {
         s.Find(child_item.Selector).Each(func(_ int, cs *goquery.Selection) {
-          line = format_line(line, get_attr(cs, child_item.Attr))
+          line = formatLine(line, getAttr(cs, child_item.Attr), sc.Enclose)
         })
       }
     })
@@ -121,7 +121,7 @@ func scraping_items(doc *goquery.Document, items []items, printUrl bool) string 
 /*
   次ページ取得
 */
-func get_next_document(doc *goquery.Document, setting scrapingSetting) (*goquery.Document, bool) {
+func getNextDocument(doc *goquery.Document, setting scrapingSetting) (*goquery.Document, bool) {
   url, exists := doc.Find(setting.NextPage.Selector).First().Attr(setting.NextPage.Attr)
 
   if ! exists || url == "" {

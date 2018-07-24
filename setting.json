@@ -1,8 +1,8 @@
 {
-"parallel":1,
+"parallel":3,
 "lineheader" : true,
 "separator" : "\t",
-
+"encode" : "ShiftJIS",
 "next_page" : {
   "selector" : "link[rel^='next']",
   "attr" : "href"
@@ -13,6 +13,7 @@
     "name" : "meta",
     "print_url" : true,
     "output_file" : "./resut_meta.tsv",
+    "enclose" : "\"",
     "items" : [
       { "selector" : "title",                       "attr" : "text" },
       { "selector" : "h1",                          "attr" : "text" },

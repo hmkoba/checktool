@@ -25,6 +25,7 @@ type items struct {
 type scrapingItems struct {
   Name string `json:"name"`
   OutputFile string `json:"output_file"`
+  Enclose string `json:"enclose"`
   PrintUrl bool `json:"print_url"`
   Items []items `json:"items"`
 }
@@ -33,6 +34,7 @@ type scrapingSetting struct {
   Parallel int `json:"parallel"`
   LineHeader bool `json:"lineheader"`
   Separator string `json:"separator"`
+  Encode string `json:"encode"`
   NextPage struct {
     Selector string `json:"selector"`
     Attr string `json:"attr"`
@@ -43,7 +45,7 @@ type scrapingSetting struct {
 /*
   スクレイピングの定義をjsonファイルから取得する
 */
-func read_setting() (scrapingSetting, error) {
+func readSetting() (scrapingSetting, error) {
   // JSONファイル読み込み
   bytes, err := ioutil.ReadFile(setting_path)
   if err != nil {
