@@ -15,7 +15,11 @@ func main() {
     return
   }
 
-  urls  := []string {
+  // 入力元
+  urls, err := readListFile(setting.UrlFile)
+  if err != nil {
+    log.Fatal(err)
+    return
   }
 
   // 出力先
@@ -76,7 +80,7 @@ func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.Wait
       if scrapingItem.OutputFile == "" || fd[i] == nil {
         fmt.Print(result_line)
       } else {
-          fd[i].Write([]byte(encodeString(result_line, setting.Encode)))
+        fd[i].Write([]byte(encodeString(result_line, scrapingItem.Encode)))
       }
     }
 
@@ -95,22 +99,22 @@ func scrapingDocument(doc *goquery.Document, sc scrapingItems) string {
 
   line := ""
   if sc.PrintUrl {
-    line = formatLine(line, doc.Url.String(), sc.Enclose)
+    line = formatLine(line, doc.Url.String(), sc.Enclose, sc.Separator)
   }
   for _, item := range sc.Items {
 
     doc.Find(item.Selector).Each(func(_ int, s *goquery.Selection) {
 
       if item.Attr != "" {
-        line = formatLine(line, getAttr(s, item.Attr), sc.Enclose)
+        line = formatLine(line, getAttr(s, item.Attr), sc.Enclose, sc.Separator)
       }
       if item.Attr2 != "" {
-        line = formatLine(line, getAttr(s, item.Attr2), sc.Enclose)
+        line = formatLine(line, getAttr(s, item.Attr2), sc.Enclose, sc.Separator)
       }
 
       for _, child_item := range item.Items {
         s.Find(child_item.Selector).Each(func(_ int, cs *goquery.Selection) {
-          line = formatLine(line, getAttr(cs, child_item.Attr), sc.Enclose)
+          line = formatLine(line, getAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
         })
       }
     })

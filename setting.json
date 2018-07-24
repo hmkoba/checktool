@@ -1,19 +1,21 @@
 {
-"parallel":3,
+"parallel"   : 3,
 "lineheader" : true,
-"separator" : "\t",
-"encode" : "ShiftJIS",
+"url_file"   : "url.txt",
+
 "next_page" : {
   "selector" : "link[rel^='next']",
-  "attr" : "href"
+  "attr"     : "href"
 },
 
 "scraping_items" : [
   {
-    "name" : "meta",
-    "print_url" : true,
+    "name"        : "meta",
+    "print_url"   : true,
     "output_file" : "./resut_meta.tsv",
-    "enclose" : "\"",
+    "encode"      : "ShiftJIS",
+    "enclose"     : "\"",
+    "separator"   : "\t",
     "items" : [
       { "selector" : "title",                       "attr" : "text" },
       { "selector" : "h1",                          "attr" : "text" },

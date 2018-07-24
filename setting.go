@@ -8,37 +8,37 @@ import (
 )
 
 var setting_path = "./setting.json"
-var separator string  // 出力項目セパレータ（設定jsonから取得）
 
 type items struct {
-    Selector string `json:"selector"`
-    Attr string `json:"attr"`
-    Attr2 string `json:"attr2"`
+    Selector string   `json:"selector"`
+    Attr string       `json:"attr"`
+    Attr2 string      `json:"attr2"`
 
     Items []struct {
       Selector string `json:"selector"`
-      Attr string `json:"attr"`
-    } `json:"items"`
+      Attr string     `json:"attr"`
+    }                 `json:"items"`
 
 }
 
 type scrapingItems struct {
-  Name string `json:"name"`
+  Name string       `json:"name"`
   OutputFile string `json:"output_file"`
-  Enclose string `json:"enclose"`
-  PrintUrl bool `json:"print_url"`
-  Items []items `json:"items"`
+  Encode string     `json:"encode"`
+  Enclose string    `json:"enclose"`
+  Separator string  `json:"separator"`
+  PrintUrl bool     `json:"print_url"`
+  Items []items     `json:"items"`
 }
 
 type scrapingSetting struct {
-  Parallel int `json:"parallel"`
-  LineHeader bool `json:"lineheader"`
-  Separator string `json:"separator"`
-  Encode string `json:"encode"`
+  Parallel int      `json:"parallel"`
+  LineHeader bool   `json:"lineheader"`
+  UrlFile string    `json:"url_file"`
   NextPage struct {
     Selector string `json:"selector"`
-    Attr string `json:"attr"`
-  } `json:"next_page"`
+    Attr string     `json:"attr"`
+  }                 `json:"next_page"`
   ScrapingItems []scrapingItems `json:"scraping_items"`
 }
 
@@ -46,26 +46,26 @@ type scrapingSetting struct {
   スクレイピングの定義をjsonファイルから取得する
 */
 func readSetting() (scrapingSetting, error) {
+  var setting scrapingSetting
+
   // JSONファイル読み込み
   bytes, err := ioutil.ReadFile(setting_path)
   if err != nil {
     fmt.Print("JSON read error:")
     log.Fatal(err)
+    return setting, err
   }
   // JSONデコード
-  var setting scrapingSetting
   err = json.Unmarshal(bytes, &setting)
   if err != nil {
     fmt.Print("JSON decode error:")
     log.Fatal(err)
+    return setting, err
   }
 
   if setting.Parallel <= 0 {
     setting.Parallel = 1
   }
-
-  separator = setting.Separator
-  if separator == "" { separator = "," }
 
   return setting, err
 }
