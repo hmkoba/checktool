@@ -2,39 +2,11 @@ package main
 
 import (
   "github.com/PuerkitoBio/goquery"
-  "encoding/json"
   "fmt"
-  "io/ioutil"
+  "sync"
   "log"
+  "os"
 )
-
-type items struct {
-    Selector string `json:"selector"`
-    Attr string `json:"attr"`
-    Attr2 string `json:"attr2"`
-
-    Items []struct {
-      Selector string `json:"selector"`
-      Attr string `json:"attr"`
-    } `json:"items"`
-
-}
-
-type scrapingSetting struct {
-  Separator string `json:"separator"`
-  NextPage struct {
-    Selector string `json:"selector"`
-    Attr string `json:"attr"`
-  } `json:"next_page"`
-
-  ScrapingItems []struct {
-    Name string `json:"name"`
-    Items []items `json:"items"`
-  } `json:"scraping_items"`
-}
-
-var separator string  // 出力項目セパレータ（設定jsonから取得）
-var setting_path = "./setting.json"
 
 func main() {
 
@@ -42,65 +14,50 @@ func main() {
   if err != nil {
     return
   }
-  fmt.Printf("%+v", setting)
 
-  scraping_url("", setting)
-
-}
-
-/*
-  スクレイピングの定義をjsonファイルから取得する
-*/
-func read_setting() (scrapingSetting, error) {
-  // JSONファイル読み込み
-  bytes, err := ioutil.ReadFile(setting_path)
-  if err != nil {
-    fmt.Print("JSON read error:")
-    log.Fatal(err)
-  }
-  // JSONデコード
-  var setting scrapingSetting
-  err = json.Unmarshal(bytes, &setting)
-  if err != nil {
-    fmt.Print("JSON decode error:")
-    log.Fatal(err)
+  urls  := []string {
   }
 
-  return setting, err
-}
-
-/*
-  同一グループのスクレイピング結果を１行にまとめる
-*/
-func format_line(line string, add string) string {
-  if line == "" {
-    return add
-  }
-  return line + separator + add
-}
-
-/*
-  属性取得
-*/
-func get_attr(s *goquery.Selection, attr string) string {
-  if attr == "text" {
-    return s.Text()
-  } else {
-    ret, exists := s.First().Attr(attr)
-    if exists {
-      return ret
+  // 出力先
+  fd := make(map[int]*os.File)
+  for i, scrapingItem := range setting.ScrapingItems {
+    if scrapingItem.OutputFile != "" {
+      f, err := os.OpenFile(scrapingItem.OutputFile, os.O_WRONLY|os.O_CREATE, 0666)
+      if err != nil {
+          //エラー処理
+          log.Fatal(err)
+          return
+      }
+      fd[i] = f
     }
-    return ""
   }
+
+  defer func() {
+          for _, f := range fd {
+            f.Close()
+          }
+        }()
+
+  var w sync.WaitGroup
+  ch := make(chan bool, setting.Parallel)
+  for _, url := range urls {
+    ch <- true
+    w.Add(1)
+    go scraping_url(url, setting, ch, &w, fd)
+  }
+  w.Wait()
+
 }
 
 /*
   スクレイピングメイン処理
 */
-func scraping_url(url string, setting scrapingSetting) {
+func scraping_url(url string, setting scrapingSetting, ch chan bool, w *sync.WaitGroup, fd map[int]*os.File) {
+
+  defer func() { <-ch }()
+  defer w.Done()
 
   // 初期設定
-  separator = setting.Separator
   doc, err := goquery.NewDocument(url)
   if err != nil {
       log.Fatal(err)
@@ -112,10 +69,15 @@ func scraping_url(url string, setting scrapingSetting) {
     fmt.Println(url)
     fmt.Println("---------------------------------")
 
-    for _, scrapingItem := range setting.ScrapingItems {
+    for i, scrapingItem := range setting.ScrapingItems {
       fmt.Println(scrapingItem.Name)
-      result_line := scraping_items(doc, scrapingItem.Items)
-      fmt.Print(result_line)
+      result_line := scraping_items(doc, scrapingItem.Items, scrapingItem.PrintUrl)
+      // 出力
+      if scrapingItem.OutputFile == "" || fd[i] == nil {
+        fmt.Print(result_line)
+      } else {
+        fd[i].Write([]byte(result_line))
+      }
     }
 
     if setting.NextPage.Selector != "" {
@@ -129,13 +91,15 @@ func scraping_url(url string, setting scrapingSetting) {
 /*
   取得
 */
-func scraping_items(doc *goquery.Document, items []items) string {
+func scraping_items(doc *goquery.Document, items []items, printUrl bool) string {
 
-  lines := ""
+  line := ""
+  if printUrl {
+    line = format_line(line, doc.Url.String())
+  }
   for _, item := range items {
 
     doc.Find(item.Selector).Each(func(_ int, s *goquery.Selection) {
-      line := ""
 
       if item.Attr != "" {
         line = format_line(line, get_attr(s, item.Attr))
@@ -149,10 +113,9 @@ func scraping_items(doc *goquery.Document, items []items) string {
           line = format_line(line, get_attr(cs, child_item.Attr))
         })
       }
-      lines += line + "\n"
     })
   }
-  return lines
+  return line + "\n"
 }
 
 /*

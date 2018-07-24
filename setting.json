@@ -1,4 +1,6 @@
 {
+"parallel":1,
+"lineheader" : true,
 "separator" : "\t",
 
 "next_page" : {
@@ -8,29 +10,19 @@
 
 "scraping_items" : [
   {
-    "name" : "test1",
+    "name" : "meta",
+    "print_url" : true,
+    "output_file" : "./resut_meta.tsv",
     "items" : [
-      {
-        "selector" : "section.p-result__item",
-        "attr" : "data-id",
-        "attr2" : "data-measure",
-        "items" : [
-          { "selector" : "h2.p-result__name",       "attr" : "text" },
-          { "selector" : "a.js-result-name",        "attr" : "href" },
-          { "selector" : "p.p-result__category",    "attr" : "text" },
-          { "selector" : "a.p-result__access > span",      "attr" : "text" },
-          { "selector" : "span.p-spec__item--save", "attr" : "text" }
-        ]
-      }
-    ]
-  },
-  {
-    "name" : "test2",
-    "items" : [
-      {
-        "selector" : "title",
-        "attr" : "text"
-      }
+      { "selector" : "title",                       "attr" : "text" },
+      { "selector" : "h1",                          "attr" : "text" },
+      { "selector" : "p.p-lead__text",              "attr" : "text" },
+      { "selector" : "meta[name^='description']",   "attr" : "content" },
+      { "selector" : "link[rel^='canonical']",      "attr" : "href" },
+      { "selector" : "meta[property^='og:title']",  "attr" : "content" },
+      { "selector" : "meta[property^='og:description']", "attr" : "content" },
+      { "selector" : "meta[property^='og:url']",    "attr" : "content" },
+      { "selector" : "meta[property^='og:image']",  "attr" : "content" }
     ]
   }
 ]
