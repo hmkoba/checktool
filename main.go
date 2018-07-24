@@ -44,7 +44,7 @@ func main() {
   }
   fmt.Printf("%+v", setting)
 
-  scraping_url("https://r.gnavi.co.jp/sp/kansougei/tokyo/z-AREAM2106/list/", setting)
+  scraping_url("", setting)
 
 }
 
