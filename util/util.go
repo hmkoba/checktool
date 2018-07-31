@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
   "github.com/PuerkitoBio/goquery"
@@ -14,7 +14,7 @@ import (
 /*
   同一グループのスクレイピング結果を１行にまとめる
 */
-func formatLine(l string, add string, en string, sp string) string {
+func FormatLine(l string, add string, en string, sp string) string {
   if l == "" {
     return en + add + en
   }
@@ -27,7 +27,7 @@ func formatLine(l string, add string, en string, sp string) string {
 /*
   属性取得
 */
-func getAttr(s *goquery.Selection, attr string) string {
+func GetAttr(s *goquery.Selection, attr string) string {
   if attr == "text" {
     return s.Text()
   } else {
@@ -39,7 +39,7 @@ func getAttr(s *goquery.Selection, attr string) string {
   }
 }
 
-func readListFile(path string) ([]string, error) {
+func ReadListFile(path string) ([]string, error) {
   l := []string{}
 
   fp, err := os.Open(path)
@@ -57,7 +57,7 @@ func readListFile(path string) ([]string, error) {
   return l, err
 }
 
-func encodeString(s string, e string) string {
+func EncodeString(s string, e string) string {
   if e == "ShiftJIS" {
     return toShiftJIS(s)
   }
@@ -75,4 +75,16 @@ func transformEncoding(r io.Reader, t transform.Transformer) string {
     } else {
         return ""
     }
+}
+
+func SliceUniq(ar []string) []string {
+    r := []string{}
+    m := map[string]bool{}
+    for _, e := range ar {
+        if !m[e] {
+            m[e] = true
+            r = append(r, e)
+        }
+    }
+    return r
 }

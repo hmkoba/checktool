@@ -6,6 +6,8 @@ import (
   "sync"
   "log"
   "os"
+  "github.com/hmkoba/checktool/util"
+//  "github.com/hmkoba/checktool/url"
 )
 
 func main() {
@@ -15,8 +17,10 @@ func main() {
     return
   }
 
+//urls := url.CreateUrlList();
+
   // 入力元
-  urls, err := readListFile(setting.UrlFile)
+  urls, err := util.ReadListFile(setting.UrlFile)
   if err != nil {
     log.Fatal(err)
     return
@@ -81,7 +85,7 @@ func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.Wait
         if scrapingItem.OutputFile == "" || fd[i] == nil {
           fmt.Println(line)
         } else {
-          fd[i].Write([]byte(encodeString(line, scrapingItem.Encode)+"\n"))
+          fd[i].Write([]byte(util.EncodeString(line, scrapingItem.Encode)+"\n"))
         }
       }
     }
@@ -104,19 +108,29 @@ func scrapingDocument(doc *goquery.Document, sc scrapingItems) []string {
 
   for _, item := range sc.Items {
 
-    doc.Find(item.Selector).Each(func(_ int, s *goquery.Selection) {
+    is := doc.Find(item.Selector)
+    if(is.Length() <= 0) {
+      line = util.FormatLine(line, "", sc.Enclose, sc.Separator)
+      continue
+    }
+    is.Each(func(_ int, s *goquery.Selection) {
       if item.Attr != "" {
-        line = formatLine(line, getAttr(s, item.Attr), sc.Enclose, sc.Separator)
+        line = util.FormatLine(line, util.GetAttr(s, item.Attr), sc.Enclose, sc.Separator)
       }
       if item.Attr2 != "" {
-        line = formatLine(line, getAttr(s, item.Attr2), sc.Enclose, sc.Separator)
+        line = util.FormatLine(line, util.GetAttr(s, item.Attr2), sc.Enclose, sc.Separator)
       }
 
       if len(item.Items) > 0 {
         cl := ""
         for _, child_item := range item.Items {
-          s.Find(child_item.Selector).Each(func(_ int, cs *goquery.Selection) {
-            cl = formatLine(cl, getAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
+          cis := s.Find(child_item.Selector)
+          if(cis.Length() <= 0) {
+            cl = util.FormatLine(cl, "", sc.Enclose, sc.Separator)
+            continue
+          }
+          cis.Each(func(_ int, cs *goquery.Selection) {
+            cl = util.FormatLine(cl, util.GetAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
           })
         }
         result = append(result, line + sc.Separator + cl)
@@ -133,7 +147,7 @@ func scrapingDocument(doc *goquery.Document, sc scrapingItems) []string {
 
 func initLine(s string, p bool, e string) string{
   if p {
-    return formatLine("", s, e, "")
+    return util.FormatLine("", s, e, "")
   }
   return ""
 
