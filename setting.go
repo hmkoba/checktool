@@ -7,7 +7,7 @@ import (
   "log"
 )
 
-var setting_path = "./setting.json"
+var setting_path = "./settings/setting.json"
 
 type items struct {
     Selector string   `json:"selector"`
@@ -35,6 +35,7 @@ type scrapingSetting struct {
   Parallel int      `json:"parallel"`
   LineHeader bool   `json:"lineheader"`
   UrlFile string    `json:"url_file"`
+  UserAgent string  `json:"user_agent"`
   NextPage struct {
     Selector string `json:"selector"`
     Attr string     `json:"attr"`
@@ -45,9 +46,12 @@ type scrapingSetting struct {
 /*
   スクレイピングの定義をjsonファイルから取得する
 */
-func readSetting() (scrapingSetting, error) {
+func readSetting(path string) (scrapingSetting, error) {
   var setting scrapingSetting
 
+  if(path != "") {
+    setting_path = path
+  }
   // JSONファイル読み込み
   bytes, err := ioutil.ReadFile(setting_path)
   if err != nil {

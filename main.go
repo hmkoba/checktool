@@ -6,13 +6,15 @@ import (
   "sync"
   "log"
   "os"
+  "flag"
+  "net/http"
   "github.com/hmkoba/checktool/util"
 //  "github.com/hmkoba/checktool/url"
 )
 
 func main() {
-
-  setting, err := readSetting()
+  flag.Parse()
+  setting, err := readSetting(flag.Arg(0))
   if err != nil {
     return
   }
@@ -65,8 +67,19 @@ func scrapingUrl(url string, setting scrapingSetting, ch chan bool, w *sync.Wait
   defer func() { <-ch }()
   defer w.Done()
 
+  req, err := http.NewRequest("GET", url, nil)
+  if err != nil {
+      log.Fatal(err)
+      return
+  }
+  if(setting.UserAgent != "") {
+    req.Header.Add("User-Agent", setting.UserAgent)
+  }
+  cl := &http.Client{}
+  res, err := cl.Do(req)
+
   // 初期設定
-  doc, err := goquery.NewDocument(url)
+  doc, err := goquery.NewDocumentFromResponse(res)
   if err != nil {
       log.Fatal(err)
       return

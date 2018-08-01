@@ -1,0 +1,55 @@
+{
+"parallel"   : 3,
+"lineheader" : true,
+"url_file"   : "settings/url.txt",
+
+"next_page" : {
+  "selector" : "link[rel^='next']",
+  "attr"     : "href"
+},
+
+"scraping_items" : [
+  {
+    "name"        : "meta",
+    "print_url"   : true,
+    "output_file" : "./resut_meta.tsv",
+    "encode"      : "ShiftJIS",
+    "enclose"     : "\"",
+    "separator"   : "\t",
+    "items" : [
+      { "selector" : "title",                       "attr" : "text" },
+      { "selector" : "h1",                          "attr" : "text" },
+      { "selector" : "p.p-lead__text",              "attr" : "text" },
+      { "selector" : "link[rel^='canonical']",      "attr" : "href" },
+      { "selector" : "link[rel^='prev']",           "attr" : "href" },
+      { "selector" : "link[rel^='next']",           "attr" : "href" },
+      { "selector" : "meta[name^='description']",   "attr" : "content" },
+      { "selector" : "meta[property^='og:title']",  "attr" : "content" },
+      { "selector" : "meta[property^='og:description']", "attr" : "content" },
+      { "selector" : "meta[property^='og:url']",    "attr" : "content" },
+      { "selector" : "meta[property^='og:image']",  "attr" : "content" }
+    ]
+  },
+  {
+    "name" : "shop",
+    "print_url"   : true,
+    "output_file" : "./resut_shop.tsv",
+    "encode"      : "ShiftJIS",
+    "separator"   : "\t",
+    "items" : [
+      {
+        "selector" : "section.p-result__item",
+        "attr" : "data-id",
+        "attr2" : "data-measure",
+        "items" : [
+          { "selector" : "h2.p-result__name",       "attr" : "text" },
+          { "selector" : "a.js-result-name",        "attr" : "href" },
+          { "selector" : "p.p-result__category",    "attr" : "text" },
+          { "selector" : "a.p-result__access > span",      "attr" : "text" },
+          { "selector" : "span.p-spec__item--save", "attr" : "text" }
+        ]
+      }
+    ]
+  }
+]
+}

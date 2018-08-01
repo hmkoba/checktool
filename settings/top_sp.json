@@ -1,7 +1,8 @@
 {
 "parallel"   : 3,
 "lineheader" : true,
-"url_file"   : "url.txt",
+"url_file"   : "settings/url.txt",
+"user_agent" : "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",
 
 "next_page" : {
   "selector" : "link[rel^='next']",
@@ -19,11 +20,10 @@
     "items" : [
       { "selector" : "title",                       "attr" : "text" },
       { "selector" : "h1",                          "attr" : "text" },
-      { "selector" : "p.p-lead__text",              "attr" : "text" },
+      { "selector" : "p.p-modal-lead__text",        "attr" : "text" },
       { "selector" : "link[rel^='canonical']",      "attr" : "href" },
       { "selector" : "link[rel^='prev']",           "attr" : "href" },
       { "selector" : "link[rel^='next']",           "attr" : "href" },
-      { "selector" : "link[rel^='canonical']",      "attr" : "href" },
       { "selector" : "meta[name^='description']",   "attr" : "content" },
       { "selector" : "meta[property^='og:title']",  "attr" : "content" },
       { "selector" : "meta[property^='og:description']", "attr" : "content" },
