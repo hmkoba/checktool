@@ -1,14 +1,14 @@
 {
-"parallel"   : 3,
-"lineheader" : true,
-"url_file"   : "settings/url.txt",
+  "parallel"   : 3,
+  "lineheader" : true,
+  "url_file"   : "settings/url.txt",
 
-"next_page" : {
-  "selector" : "link[rel^='next']",
-  "attr"     : "href"
-},
+  "next_page" : {
+    "selector" : "link[rel^='next']",
+    "attr"     : "href"
+  },
 
-"scraping_items" : [
+  "scraping_items" : [
   {
     "name"        : "meta",
     "print_url"   : true,

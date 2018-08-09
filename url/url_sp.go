@@ -2,15 +2,18 @@ package url
 import (
   "log"
   "strings"
+  "fmt"
   "github.com/hmkoba/checktool/util"
 )
 
-func CreateUrlList() []string {
+func CreateUrlListSp() (map[string]string, map[string][]string) {
 
-  result := []string{}
+  checkList := make(map[string][]string)
+
+  result := make(map[string]string)
   setting, err := readSetting("")
   if err != nil {
-    return result
+    return result, checkList
   }
 
   // 入力元
@@ -26,6 +29,10 @@ func CreateUrlList() []string {
     url := setting.Domain + "/"
 
     items := strings.Split(line, ",")
+
+    // TODO
+    key := items[0] + "_" + items[1] + "_" + items[2] + "_" + items[3] + "_" + items[4] + "_" + items[7]
+    checkList[key] = append(checkList[key], items[5] + "_" + items[6])
 
     for _, urlItem := range setting.UrlItems {
       switch urlItem.Attr {
@@ -47,9 +54,12 @@ func CreateUrlList() []string {
       }
 
     }
-    result = append(result, url)
+    if _, ok := result[key]; ! ok {
+      result[key] = url
+    }
   }
-  result = util.SliceUniq(result)
 
-  return result
+  fmt.Println(checkList)
+
+  return result, checkList
 }

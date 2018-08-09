@@ -1,4 +1,4 @@
-package main
+package scraping
 
 import (
   "encoding/json"
@@ -9,7 +9,7 @@ import (
 
 var setting_path = "./settings/setting.json"
 
-type items struct {
+type Item struct {
     Selector string   `json:"selector"`
     Attr string       `json:"attr"`
     Attr2 string      `json:"attr2"`
@@ -21,17 +21,17 @@ type items struct {
 
 }
 
-type scrapingItems struct {
+type ScrapingItem struct {
   Name string       `json:"name"`
   OutputFile string `json:"output_file"`
   Encode string     `json:"encode"`
   Enclose string    `json:"enclose"`
   Separator string  `json:"separator"`
   PrintUrl bool     `json:"print_url"`
-  Items []items     `json:"items"`
+  Items []Item     `json:"items"`
 }
 
-type scrapingSetting struct {
+type ScrapingSetting struct {
   Parallel int      `json:"parallel"`
   LineHeader bool   `json:"lineheader"`
   UrlFile string    `json:"url_file"`
@@ -40,14 +40,14 @@ type scrapingSetting struct {
     Selector string `json:"selector"`
     Attr string     `json:"attr"`
   }                 `json:"next_page"`
-  ScrapingItems []scrapingItems `json:"scraping_items"`
+  ScrapingItems []ScrapingItem `json:"scraping_items"`
 }
 
 /*
   スクレイピングの定義をjsonファイルから取得する
 */
-func readSetting(path string) (scrapingSetting, error) {
-  var setting scrapingSetting
+func ReadSetting(path string) (ScrapingSetting, error) {
+  var setting ScrapingSetting
 
   if(path != "") {
     setting_path = path

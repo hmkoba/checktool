@@ -1,0 +1,18 @@
+{
+  "input_file" : "./j.csv",
+  "lineheader" : true,
+  "domain" : "https://test.co.jp/sp",
+  "url_items" : [
+    { "attr" : "input", "column" : 0, "out" : "{$}" },
+    { "attr" : "input", "column" : 1, "out" : "{$}" },
+    { "attr" : "input", "column" : 4, "out" : "z-{$}" },
+    { "attr" : "input", "column" : 7, "exclusion" : "2",
+      "url_items" : [
+        { "attr" : "input", "column" : 2, "out" : "c-{$}" },
+        { "attr" : "input", "column" : 3, "out" : "t-{$}" }
+      ]
+    },
+    { "attr" : "fix", "out" : "list" }
+  ]
+
+}
