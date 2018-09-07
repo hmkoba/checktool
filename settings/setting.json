@@ -36,6 +36,7 @@
     "output_file" : "./resut_shop.tsv",
     "encode"      : "ShiftJIS",
     "separator"   : "\t",
+    "inner_separator"   : ",",
     "items" : [
       {
         "selector" : "section.p-result__item",
@@ -46,7 +47,9 @@
           { "selector" : "a.js-result-name",        "attr" : "href" },
           { "selector" : "p.p-result__category",    "attr" : "text" },
           { "selector" : "a.p-result__access > span",      "attr" : "text" },
-          { "selector" : "span.p-spec__item--save", "attr" : "text" }
+          { "selector" : "span.p-spec__item--save", "attr" : "text" },
+          { "selector" : "span.p-spec__item--use", "attr" : "text" },
+          { "selector" : "ul.p-spec__info li", "attr" : "text" }
         ]
       }
     ]

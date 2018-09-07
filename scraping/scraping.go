@@ -98,8 +98,14 @@ func scrapingDocument(doc *goquery.Document, sc ScrapingItem) []string {
             cl = util.FormatLine(cl, "", sc.Enclose, sc.Separator)
             continue
           }
+          isSecond := false
           cis.Each(func(_ int, cs *goquery.Selection) {
-            cl = util.FormatLine(cl, util.GetAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
+            if isSecond && sc.InnerSeparator != "" {
+              cl = util.FormatLine(cl, util.GetAttr(cs, child_item.Attr), sc.Enclose, sc.InnerSeparator)
+            } else {
+              cl = util.FormatLine(cl, util.GetAttr(cs, child_item.Attr), sc.Enclose, sc.Separator)
+              isSecond = true
+            }
           })
         }
         result = append(result, line + sc.Separator + cl)

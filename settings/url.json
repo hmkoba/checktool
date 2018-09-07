@@ -1,7 +1,7 @@
 {
   "input_file" : "./j.csv",
   "lineheader" : true,
-  "domain" : "https://test.co.jp/sp",
+  "domain" : "https://test.jp/sp",
   "url_items" : [
     { "attr" : "input", "column" : 0, "out" : "{$}" },
     { "attr" : "input", "column" : 1, "out" : "{$}" },

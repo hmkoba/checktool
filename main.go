@@ -22,18 +22,18 @@ func sp() {
   var w sync.WaitGroup
   ch := make(chan bool, setting.Parallel)
   rch := make(chan []string, setting.Parallel)
+
   for key, url := range urls {
     ch <- true
     w.Add(1)
     go scraping.ScrapingUrl(url, setting, ch, rch, &w, nil)
-    ret := <- rch
+    scRet := <- rch
     fmt.Println(key)
     list := checkList[key]
     for _, l := range list {
-//      fmt.Println(tmp_key)
 
       r := func () bool {
-        for _, k := range ret {
+        for _, k := range scRet {
           items := strings.Split(k, "\t")
           w := strings.Split(strings.Trim(items[1], "[]"),",")
           tmp_key := items[0] + "_" + strings.Trim(w[5], "'")

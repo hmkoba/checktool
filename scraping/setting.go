@@ -27,6 +27,7 @@ type ScrapingItem struct {
   Encode string     `json:"encode"`
   Enclose string    `json:"enclose"`
   Separator string  `json:"separator"`
+  InnerSeparator string  `json:"inner_separator"`
   PrintUrl bool     `json:"print_url"`
   Items []Item     `json:"items"`
 }
